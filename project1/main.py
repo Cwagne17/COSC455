@@ -1,25 +1,17 @@
 import os, logging
 
-LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 
-                       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
 DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 UNDERSCORE = "_"
-
-KEYWORDS = ["program", "end", 
-            "bool", "int", 
-            "if", "then", "else", "fi", 
-            "while", "do", "od",
-            "print", 
-            "or", "and", "not", 
-            "false", "true"]
-
 SYNTAX_SPECIAL_CHARS = [":", ";", "(", ")", "<", ">", "=", "!", "/", "+", "-", "*"]
 
+KEYWORDS = ["program", "end", "bool", "int", "if", "then", "else", "fi", "while", "do", "od", "print", "or", "and", "not", "false", "true"]
 RELATIONAL_OPERATORS = [":=", "<", "=<", "=", "!=", ">=", ">"]
 ARITHMETIC_OPERATORS = ["+", "-", "*", "/"]
-COMMENT = "//"
 
+COMMENT = "//"
 NEWLINE = "\n"
+WHITESPACE=" "
 
 class Lexeme:
     """Type for identifying tokens in mini-language's lexical analyzer
@@ -54,88 +46,76 @@ class Lexeme:
         """
         return f"ln{self.ln_num}:{self.char_pos}"
 
-def recognizeID(ln, pos):
-    i=pos
-    token_val=""
-    while True:
-        if not(ln[i] in LETTERS or ln[i] in UNDERSCORE or ln[i] in DIGITS):
-            break
-        token_val=token_val+ln[i]
-        i+=1
+def recognizeID(ln, ln_num=0, char_pos=0):
+    value=""
     kind="ID"
-    if token_val in KEYWORDS:
-        kind=token_val
-    return i, kind, token_val
-
-def recognizeNUM(ln, pos):  
-    i=pos
-    token_val=""
+    position=char_pos
+    
     while True:
-        if ln[i] not in DIGITS:
-            break
-        token_val=token_val+ln[i]
-        i+=1
-    return i, "NUM", token_val
+        if not(ln[position]in LETTERS or ln[position] in UNDERSCORE or ln[position] in DIGITS): break
+        value=value+ln[position]
+        position+=1
+        
+    if value in KEYWORDS:
+        kind=value
+        
+    return position+1, Lexeme(ln_num, char_pos, kind, value)
 
-def recognizeSPECIAL(ln, pos):
-    char=ln[pos]
+def recognizeNUM(ln, ln_num, char_pos):  
+    value=""
+    kind="NUM"
+    position=char_pos
     
-    # Check for comment
-    if char == "/" and len(ln)>pos+1:
-        if ln[pos+1] == "/":
-            return len(ln), "//", "//"
-    
-    # Check for arithmetic op
-    if char in ARITHMETIC_OPERATORS:
-        return pos+1, char, char
-    
-    # Check for Relop
-    if len(ln)>pos+2:
-        tmp=char+ln[pos+1]
-        if tmp in RELATIONAL_OPERATORS:
-            return pos+1, tmp, tmp
-    elif char in RELATIONAL_OPERATORS:
-        return pos+1, char, char
-    
-    return pos+1, char, char
+    while True:
+        if ln[position] not in DIGITS: break
+        value=value+ln[position]
+        position+=1
+        
+    return position+1, Lexeme(ln_num, char_pos, kind, value)
 
-def next(ln_num, ln):
-    if ln is not None:
-        i=0
-        while i < len(ln)-1:
-            char = ln[i]
-            if char == NEWLINE or char == " ":
-                i+=1
-                continue
-            elif char in LETTERS:
-                end_pos, kind, value = recognizeID(ln, i)
-                token = Lexeme(ln_num=ln_num, char_pos=i, kind=kind, value=value)
-                i=end_pos
-                print(token.getPosition(), token.kind, token.value)
-            elif char in DIGITS:
-                end_pos, kind, value = recognizeNUM(ln,i)
-                token = Lexeme(ln_num=ln_num, char_pos=i, kind=kind, value=value)
-                i=end_pos
-                print(token.getPosition(), token.kind, token.value)
-            elif char in SYNTAX_SPECIAL_CHARS: 
-                end_pos, kind, value = recognizeSPECIAL(ln,i)
-                token = Lexeme(ln_num=ln_num, char_pos=i, kind=kind, value=value)
-                i=end_pos
-                print(token.getPosition(), token.kind, token.value)
-            else:
-                i+=1
-                logging.error(f"ln{ln_num}:{i} Character is invalid, {char}")
-                exit()
-            
-            # print(i)
-        # return Lexeme(ln_pos="", char_pos="", kind="", value="")
+def recognizeSPECIAL(ln, ln_num, char_pos):
+    value=ln[char_pos]
+    position=char_pos
+
+    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE]:
+        value = ln[char_pos: char_pos+2]
+        
+        if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value=COMMENT)
+        
+        elif value in RELATIONAL_OPERATORS: position+=2
+
+    elif value != "/": position+=1
+    
+    else: print(f"\nln{ln_num}:{char_pos} Character is invalid, {value}"); exit()
+    
+    return position, Lexeme(ln_num, char_pos, kind=value, value=value)
+
+def next(ln, ln_num=0, char_pos=0):
+    # Skip whitespace
+    while ln[char_pos] in [NEWLINE, WHITESPACE]: 
+        if ln[char_pos] == NEWLINE: return char_pos+1, None
+        char_pos+=1
+    
+    # Recognize next token
+    char=ln[char_pos]
+    if char in LETTERS: return recognizeID(ln, ln_num, char_pos)
+    
+    elif char in DIGITS: return recognizeNUM(ln, ln_num, char_pos)
+    
+    elif char in SYNTAX_SPECIAL_CHARS: return recognizeSPECIAL(ln, ln_num, char_pos)
+    
+    # Catch incorect character
+    else: print(f"\nln{ln_num}:{char_pos} Character is invalid, {char}"); exit()
+    
 
 def main():
-    with open("examples/ab3.txt") as fin:
+    with open("examples/if.txt") as fin:
+        print("Position\tKind\t\tValue")
         for ln_num, ln in enumerate(fin.readlines()):
-            # print([char for char in ln])
-            lex = next(ln_num, ln)
-            # print(lex.getPosition(), lex.getKind(), lex.getValue())
+            char_pos=0
+            while char_pos < len(ln):
+                char_pos, token = next(ln, ln_num, char_pos)
+                if token: print(f"{token.getPosition()}\t\t{token.kind}\t\t{token.value}")
         
 main()    
         
