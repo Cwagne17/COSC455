@@ -1,11 +1,23 @@
 #! /usr/bin/env python3
-
 """Project 1: Lexical Analyzer
-Author: Christopher Wagner
-Date: 03/2022
+
+Will analyze an input file specified by the command line, or the default file "examples/if.txt".
+The analyzer will read each character of each line and print out the position, kind, and value
+of the Lexemes in the file comparing it to the grammar of mini-language.
+
+example command:
+chmod +x project1.py; ./project1.py "examples/if.txt"
 """
 
 import os, logging, sys
+
+__author__ = "Christopher Wagner"
+__credits__ = ["Christopher Wagner"]
+
+__version__ = "1.0.0"
+__maintainer__ = "Christopher Wagner"
+__email__ = "cwagne17@students.towson.edu"
+__status__ = "Development"
 
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
 DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
