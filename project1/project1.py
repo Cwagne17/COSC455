@@ -1,4 +1,8 @@
-import os, logging
+#! /usr/bin/env python3
+
+from operator import pos
+import os, logging, sys
+from sre_parse import SPECIAL_CHARS
 
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
 DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -77,7 +81,7 @@ def recognizeSPECIAL(ln, ln_num, char_pos):
     value=ln[char_pos]
     position=char_pos
 
-    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE]:
+    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE] and ln[position+1] in SYNTAX_SPECIAL_CHARS:
         value = ln[char_pos: char_pos+2]
         
         if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value=COMMENT)
@@ -109,7 +113,9 @@ def next(ln, ln_num=0, char_pos=0):
     
 
 def main():
-    with open("examples/if.txt") as fin:
+    FILE = sys.argv[1] if sys.argv[1] else "examples/if.txt"
+    
+    with open(FILE) as fin:
         print("Position\tKind\t\tValue")
         for ln_num, ln in enumerate(fin.readlines()):
             char_pos=0
