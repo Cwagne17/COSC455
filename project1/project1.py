@@ -63,7 +63,7 @@ class Lexeme:
         Returns:
             str: formatted str
         """
-        return f"ln{self.ln_num}:{self.char_pos}"
+        return f"({self.ln_num}, {self.char_pos})"
 
 def recognizeID(ln, ln_num=0, char_pos=0):
     value=""
@@ -74,11 +74,10 @@ def recognizeID(ln, ln_num=0, char_pos=0):
         if not(ln[position]in LETTERS or ln[position] in UNDERSCORE or ln[position] in DIGITS): break
         value=value+ln[position]
         position+=1
+    
+    token = Lexeme(ln_num, char_pos, value, "") if value in KEYWORDS else Lexeme(ln_num, char_pos, kind, value)
         
-    if value in KEYWORDS:
-        kind=value
-        
-    return position+1, Lexeme(ln_num, char_pos, kind, value)
+    return position+1, token
 
 def recognizeNUM(ln, ln_num, char_pos):  
     value=""
@@ -96,10 +95,10 @@ def recognizeSPECIAL(ln, ln_num, char_pos):
     value=ln[char_pos]
     position=char_pos
 
-    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE] and ln[position+1] in TWO_DIGIT_SPECIAL_CHARS:
+    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE] and ln[position: position+2] in TWO_DIGIT_SPECIAL_CHARS:
         value = ln[char_pos: char_pos+2]
         
-        if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value=COMMENT)
+        if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value="")
         
         position+=2
 
@@ -107,12 +106,12 @@ def recognizeSPECIAL(ln, ln_num, char_pos):
     
     else: print(f"\nln{ln_num}:{char_pos} Character is invalid, {value}"); exit()
     
-    return position, Lexeme(ln_num, char_pos, kind=value, value=value)
+    return position, Lexeme(ln_num, char_pos, kind=value, value="")
 
 def next(ln, ln_num=0, char_pos=0):
     # Skip whitespace
     while ln[char_pos] in [NEWLINE, WHITESPACE]: 
-        if ln[char_pos] == NEWLINE: return char_pos+1, None
+        if ln[char_pos] == NEWLINE: return len(ln), None
         char_pos+=1
     
     # Recognize next token
