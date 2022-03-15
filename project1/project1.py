@@ -137,6 +137,6 @@ def main():
             while char_pos < len(ln):
                 char_pos, token = next(ln, ln_num, char_pos)
                 if token: print(f"{token.getPosition()}\t\t{token.kind}\t\t{token.value}")
-        
-main()    
-        
+
+if __name__ == "__main__":    
+    main()
