@@ -14,7 +14,7 @@ import os, logging, sys
 __author__ = "Christopher Wagner"
 __credits__ = ["Christopher Wagner"]
 
-__version__ = "1.0.0"
+__version__ = "1.0.4"
 __maintainer__ = "Christopher Wagner"
 __email__ = "cwagne17@students.towson.edu"
 __status__ = "Development"
@@ -28,9 +28,10 @@ TWO_DIGIT_SPECIAL_CHARS = [":=", "=<", "!=", ">=", "//"]
 
 KEYWORDS = ["program", "end", "bool", "int", "if", "then", "else", "fi", "while", "do", "od", "print", "or", "and", "not", "false", "true"]
 
-COMMENT = "//"
-NEWLINE = "\n"
+COMMENT="//"
+NEWLINE="\n"
 WHITESPACE=" "
+TAB="\t"
 
 class Lexeme:
     """Type for identifying tokens in mini-language's lexical analyzer
@@ -56,61 +57,60 @@ class Lexeme:
         self.char_pos = char_pos
         self.kind = kind
         self.value = value
-    
-    def getPosition(self):
-        """Formats the position of the Lexeme
 
-        Returns:
-            str: formatted str
-        """
-        return f"({self.ln_num}, {self.char_pos})"
+def getPosition(ln_num=0, char_pos=0):
+    return f"{ln_num+1}:{char_pos+1}:"
+
+def invalidChar(ln_num=0, char_pos=0, char=""):
+    print(f"{getPosition(ln_num, char_pos)} Character is invalid, {char}")
+    exit()
 
 def recognizeID(ln, ln_num=0, char_pos=0):
     value=""
     kind="ID"
     position=char_pos
     
-    while True:
+    while position < len(ln):
         if not(ln[position]in LETTERS or ln[position] in UNDERSCORE or ln[position] in DIGITS): break
         value=value+ln[position]
         position+=1
     
     token = Lexeme(ln_num, char_pos, value, "") if value in KEYWORDS else Lexeme(ln_num, char_pos, kind, value)
         
-    return position+1, token
+    return position, token
 
 def recognizeNUM(ln, ln_num, char_pos):  
     value=""
     kind="NUM"
     position=char_pos
     
-    while True:
+    while position < len(ln):
         if ln[position] not in DIGITS: break
         value=value+ln[position]
         position+=1
         
-    return position+1, Lexeme(ln_num, char_pos, kind, value)
+    return position, Lexeme(ln_num, char_pos, kind, value)
 
 def recognizeSPECIAL(ln, ln_num, char_pos):
     value=ln[char_pos]
     position=char_pos
-
-    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE] and ln[position: position+2] in TWO_DIGIT_SPECIAL_CHARS:
+    
+    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE, TAB] and ln[position: position+2] in TWO_DIGIT_SPECIAL_CHARS:
         value = ln[char_pos: char_pos+2]
         
         if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value="")
         
         position+=2
 
-    elif value not in ["/", "!"]: position+=1
+    elif value not in ["!"]: position+=1
     
-    else: print(f"\nln{ln_num}:{char_pos} Character is invalid, {value}"); exit()
+    else: invalidChar(ln_num, char_pos, value)
     
     return position, Lexeme(ln_num, char_pos, kind=value, value="")
 
 def next(ln, ln_num=0, char_pos=0):
     # Skip whitespace
-    while ln[char_pos] in [NEWLINE, WHITESPACE]: 
+    while ln[char_pos] in [NEWLINE, WHITESPACE, TAB]: 
         if ln[char_pos] == NEWLINE: return len(ln), None
         char_pos+=1
     
@@ -123,7 +123,7 @@ def next(ln, ln_num=0, char_pos=0):
     elif char in SYNTAX_SPECIAL_CHARS: return recognizeSPECIAL(ln, ln_num, char_pos)
     
     # Catch incorect character
-    else: print(f"\nln{ln_num}:{char_pos} Character is invalid, {char}"); exit()
+    else: invalidChar(ln_num, char_pos, char)
     
 
 def main():
@@ -135,7 +135,8 @@ def main():
             char_pos=0
             while char_pos < len(ln):
                 char_pos, token = next(ln, ln_num, char_pos)
-                if token: print(f"{token.getPosition()}\t\t{token.kind}\t\t{token.value}")
+                if token: print(f"{getPosition(token.ln_num, token.char_pos)}\t\t{token.kind}\t\t{token.value}")
+        print(f"{getPosition(ln_num, char_pos)}\t\tend-of-text")
 
 if __name__ == "__main__":    
     main()
