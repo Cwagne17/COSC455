@@ -255,6 +255,41 @@ def printStatement():
     
 """
 
+"""
+How to make an AST...
+
+def term():
+    tree:=factor()
+    while curr_sym is multiplicative_operator:
+        op:=curr_symbol
+        next()
+        tree2:=factor()
+        tree:=node(op, tree, t2)
+    return tree
+"""
+
+"""
+Complete Error Parsing
+
+1. extend functions to accept set of follow symbols for some non terminal symbol
+
+def main():
+    next()
+    program(["end-of-text"])
+
+def program(follow):
+    match("program")
+    match("ID")
+    match(":")
+    body(["end"])
+    match("end")
+
+def body(follow):
+    if curr_sym is "bool" or "int":
+        declarations(["ID", "if", "while", "print"])
+    statements(follow)
+"""
+
 # --------------------------
 # Project 2 Runtime Section
 # --------------------------
