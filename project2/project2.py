@@ -138,14 +138,122 @@ def next(ln, ln_num=0, char_pos=0):
 # Project 2 Section of code
 # --------------------------
 
+"""
+def match(sym):
+    if curr_sym() = sym; then
+        next();
+    else: raise exception(at position i see ___, but I expect ___)
+
+def expected(set_of_symb: sym[]):
+    if csym does not belong to set_of_symb:
+        raise Exception("at position I expected to see ... but see ...")
+
+def program():
+    match("program")
+    match("ID")
+    match(":")
+    body()
+    match("end")
+    
+def body():
+    if curr_sym is "bool" or "int":
+        declarations();
+    statements()
+
+def declarations():
+    declaration();
+    while(curr_sym is "bool" or "int")
+        declaration()
+
+def declaration():
+    assert curr_sym is "bool" or "int"
+    next()
+    match(ID)
+    match(;)
+
+def statements():
+    statment()
+    while(curr_sym is ";")
+        statement()
+
 def statement():
-    print('not yet implemented.')
+    if curr_sym is ID: assignmentStatement()
+    elif curr_sym is "if": conditionalStatement()
+    elif curr_sym is "while": iterativeStatement()
+    elif cyrr_sym is "print": printStatement()
+    else: raise exception()
 
-def op():
-    print('not yet implemented.')
+def assignmentStatement():
+    assert curr_sym is ID
+        next()
+    match(":=")
+    expression()
 
-def match():
-    print('not yet implemented.')
+def expression():
+    simpleExpression()
+    if curr_sym is relational_operator:
+        next()
+        simpleExpression()
+
+def simpleExpression():
+    term()
+    while curr_sym is additive_operator:
+        next()
+        term()
+
+def term():
+    factor()
+    while curr_sym is multiplicative_operator:
+        next()
+        factor()
+    
+def factor():
+    if curr_sym is unary_operator
+        next()
+    if curr_sym is "false" or "true" or "NUM"
+        literal()
+    elif curr_sym is "ID"
+        next()
+    elif curr_sym is "(":
+        next()
+        expression()
+        match(")")
+    else: raise exception()
+
+def literal():
+    assert curr_sym is "true", "false", or "NUM"
+    if curr_sym is "NUM": next()
+    else:
+        booleanLiteral()
+
+def booleanLiteral():
+    assert curr_sym is "true" or "false"
+    next()
+
+def conditionalStatment():
+    assert curr_sym is "if"
+        next()
+    expression()
+    match("then")
+    body()
+    if cyrr_sym is "else"
+        next(); body();
+    match("fi")
+
+def iterativeStatement():
+    assert curr_sym is "while"
+        next()
+    expression()
+    match("do")
+    body()
+    match("od")
+
+def printStatement():
+    assert curr_sym is "print"
+        next()
+    expression()
+    
+"""
 
 # --------------------------
 # Project 2 Runtime Section
