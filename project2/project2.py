@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
-"""Project 1: Lexical Analyzer
+"""Project 2: Syntax Analyzer
 
-Will analyze an input file specified by the command line, or the default file "examples/if.txt".
-The analyzer will read each character of each line and print out the position, kind, and value
-of the Lexemes in the file comparing it to the grammar of mini-language.
+The syntax analyzer implements a top-down, predictive, recursive descent parser for it.
+The parser should take an input file from the command line. Then it should return true if the input is correct syntactically according to “grammar.txt”.
+As soon as a syntax error is encountered the parser should stop (terminate execution) and return the position of the error.
 
 example command:
-chmod +x project1.py; ./project1.py "examples/if.txt"
+chmod +x project2.py; ./project2.py "examples/if.txt"
 """
 
 import os, logging, sys
@@ -14,10 +14,14 @@ import os, logging, sys
 __author__ = "Christopher Wagner"
 __credits__ = ["Christopher Wagner"]
 
-__version__ = "1.0.4"
+__version__ = "1.0.0"
 __maintainer__ = "Christopher Wagner"
 __email__ = "cwagne17@students.towson.edu"
 __status__ = "Development"
+
+# --------------------------
+# Mock Symbol Table
+# --------------------------
 
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
 DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -32,6 +36,10 @@ COMMENT="//"
 NEWLINE="\n"
 WHITESPACE=" "
 TAB="\t"
+
+# --------------------------
+# Project 1 Section of code
+# --------------------------
 
 class Lexeme:
     """Type for identifying tokens in mini-language's lexical analyzer
@@ -125,6 +133,23 @@ def next(ln, ln_num=0, char_pos=0):
     # Catch incorect character
     else: invalidChar(ln_num, char_pos, char)
     
+    
+# --------------------------
+# Project 2 Section of code
+# --------------------------
+
+def statement():
+    print('not yet implemented.')
+
+def op():
+    print('not yet implemented.')
+
+def match():
+    print('not yet implemented.')
+
+# --------------------------
+# Project 2 Runtime Section
+# --------------------------
 
 def main():
     FILE = sys.argv[1] if sys.argv[1] else "examples/if.txt"
