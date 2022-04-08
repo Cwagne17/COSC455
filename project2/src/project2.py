@@ -9,7 +9,7 @@ example command:
 chmod +x src/project2.py; src/project2.py "examples/if.txt"
 """
 
-import os, logging, sys
+import sys
 from symbol_table import *
 from Lexeme import Lexeme
 from LexicalAnalyzer import *
@@ -28,8 +28,8 @@ __status__ = "Development"
 
 CHAR_POSITION=0
 LINE_NUMBER=0
-LINE=""
 CURR_SYMBOL=None
+FILE_CONTENT=None
    
 # --------------------------
 # Project 2 Section of code
@@ -190,32 +190,39 @@ def declarations(follow):
 # --------------------------
 
 def next():
-    global CURR_SYMBOL, CHAR_POSITION, LINE_NUMBER, LINE
+    global CURR_SYMBOL, CHAR_POSITION, LINE_NUMBER, FILE_CONTENT
     
-    # Skip whitespace
-    while LINE[CHAR_POSITION] in [NEWLINE, WHITESPACE, TAB]: 
-        if LINE[CHAR_POSITION] == NEWLINE: return len(LINE), None
-        CHAR_POSITION+=1
-    
-    # Recognize next token
-    char=LINE[CHAR_POSITION]
-    if char in LETTERS: CHAR_POSITION, CURR_SYMBOL = recognizeID(LINE, LINE_NUMBER, CHAR_POSITION)
-    
-    elif char in DIGITS: CHAR_POSITION, CURR_SYMBOL = recognizeNUM(LINE, LINE_NUMBER, CHAR_POSITION)
-    
-    elif char in SYNTAX_SPECIAL_CHARS: CHAR_POSITION, CURR_SYMBOL = recognizeSPECIAL(LINE, LINE_NUMBER, CHAR_POSITION)
-    
-    # Catch incorect character
-    else: invalidChar(LINE_NUMBER, CHAR_POSITION, char)
-    
-    if CURR_SYMBOL: print(f"{getPosition(CURR_SYMBOL.ln_num, CURR_SYMBOL.char_pos)}\t\t{CURR_SYMBOL.kind}\t\t{CURR_SYMBOL.value}")
+    if CHAR_POSITION < len(FILE_CONTENT[LINE_NUMBER]):
+        # Skip whitespace
+        while FILE_CONTENT[LINE_NUMBER][CHAR_POSITION] in [NEWLINE, WHITESPACE, TAB]:
+            if FILE_CONTENT[LINE_NUMBER][CHAR_POSITION] == NEWLINE:
+                CHAR_POSITION = 0
+                LINE_NUMBER += 1
+                if LINE_NUMBER >= len(FILE_CONTENT): print(f"{getPosition(LINE_NUMBER, CHAR_POSITION)}\t\tend-of-text"); exit()
+            else: CHAR_POSITION+=1
+
+        # Recognize next token
+        line=FILE_CONTENT[LINE_NUMBER]
+        char=line[CHAR_POSITION]
+        
+        if char in LETTERS: CHAR_POSITION, CURR_SYMBOL = recognizeID(line, LINE_NUMBER, CHAR_POSITION)
+        
+        elif char in DIGITS: CHAR_POSITION, CURR_SYMBOL = recognizeNUM(line, LINE_NUMBER, CHAR_POSITION)
+        
+        elif char in SYNTAX_SPECIAL_CHARS: CHAR_POSITION, CURR_SYMBOL = recognizeSPECIAL(line, LINE_NUMBER, CHAR_POSITION)
+        
+        # Catch incorect character
+        else: invalidChar(LINE_NUMBER, CHAR_POSITION, char)
+        
+        if CURR_SYMBOL and CURR_SYMBOL.kind == COMMENT: CHAR_POSITION=0; LINE_NUMBER+=1; next()
+        if CURR_SYMBOL: print(f"{getPosition(CURR_SYMBOL.ln_num, CURR_SYMBOL.char_pos)}\t\t{CURR_SYMBOL.kind}\t\t{CURR_SYMBOL.value}")
 
 # --------------------------
 # Project 2 Runtime Section
 # --------------------------
 
 def main():
-    global CHAR_POSITION, LINE_NUMBER, LINE, CURR_SYMBOL
+    global CHAR_POSITION, LINE_NUMBER, CURR_SYMBOL, FILE_CONTENT
     try:
         if len(sys.argv) != 2:
             print("File input not given.")
@@ -224,12 +231,10 @@ def main():
         print("Position\tKind\t\tValue")
         
         with open(sys.argv[1]) as fin:
-            for LINE_NUMBER, LINE in enumerate(fin.readlines()):
-                CHAR_POSITION=0
-                while CHAR_POSITION < len(LINE)-1:
-                    next()
-                    program()
-            print(f"{getPosition(LINE_NUMBER, CHAR_POSITION)}\t\tend-of-text")
+            FILE_CONTENT = fin.readlines()
+            
+        next()
+        program()
     except Exception as e:
         print(e)
 if __name__ == "__main__":    
