@@ -1,0 +1,47 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with C-x C-f and enter text in its buffer.
+
+(quote a)
+(quote(1 2 3))
+(atom 'a) ;; t stands for true, () is false
+(atom (quote a)) ;; same as above
+(atom (atom 'a)) ;; inside is input for outer atom
+;; evaluates list inside of the cursor
+
+'(a b c) ;; defines that the rest of the list is a quote
+
+(atom '(1 2 3 )) ;; returns nil if evaluating outer list b/c list is not an atom
+
+(eq 'a 'b) ;; comparing atoms
+
+() ;; empty list is both an atom and a list
+
+(car list) ;; car is a function that takes a list as a argument and returns the head of the list
+(car '(a b c d))
+(cdr '(a b c d)) ;; takes a list and returns the tail returns (b c d)
+(defun multiply-by-seven (number)
+  "Multiply NUMBER by seven."
+  (* 7 number))
+
+(cond ;; can take any number of conditions and evalutates the first true condition
+ ('(eq '() '()) 'zero)
+ ((eq 'a 'b) 'first)
+ ((atom 'a) 'second)
+ )
+
+(defun double (number)
+  "Multiple a NUMBER by two."
+  (* 2  number)
+)
+(double 2)
+
+(defun members-are-atoms (l)
+  "Returns true if all the members of the list are atoms."
+  (cond
+   ((null l) t)
+   ((atom (car l)) members-are-atoms(cdr l))
+   (t nil)
+  )
+)
+(members-are-atoms '(1 2 3 4))
+

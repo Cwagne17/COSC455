@@ -1,0 +1,17 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with C-x C-f and enter text in its buffer.
+
+(quote a)
+(quote(1 2 3))
+(atom 'a) ;; t stands for true, () is false
+(atom (quote a)) ;; same as above
+(atom (atom 'a)) ;; inside is input for outer atom
+;; evaluates list inside of the cursor
+
+'(a b c) ;; defines that the rest of the list is a quote
+
+(atom '(1 2 3 )) ;; returns nil if evaluating outer list b/c list is not an atom
+
+(eq 'a 'b) ;; comparing atoms
+
+() ;; empty list is both an atom and a list
