@@ -54,6 +54,7 @@ def program():
 
 def body():
     if CURR_SYMBOL.kind in ["bool", "int"]: declarations()
+    print('here')
     statements()
 
 def declarations():
@@ -68,7 +69,9 @@ def declaration():
 
 def statements():
     statement()
-    while CURR_SYMBOL.kind == ";": statement()
+    while CURR_SYMBOL.kind == ";": 
+        next()
+        statement()
 
 def statement():
     if CURR_SYMBOL.kind == "ID": assignmentStatement()
@@ -215,6 +218,7 @@ def next():
         else: invalidChar(LINE_NUMBER, CHAR_POSITION, char)
         
         if CURR_SYMBOL and CURR_SYMBOL.kind == COMMENT: CHAR_POSITION=0; LINE_NUMBER+=1; next()
+        
         if CURR_SYMBOL: print(f"{getPosition(CURR_SYMBOL.ln_num, CURR_SYMBOL.char_pos)}\t\t{CURR_SYMBOL.kind}\t\t{CURR_SYMBOL.value}")
 
 # --------------------------

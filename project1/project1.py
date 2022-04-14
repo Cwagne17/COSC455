@@ -97,7 +97,7 @@ def recognizeNUM(ln, ln_num, char_pos):
         value=value+ln[position]
         position+=1
         
-    return position, Lexeme(ln_num, char_pos, kind, value)
+    return position, Lexeme(ln_num, char_pos, kind, int(value))
 
 def recognizeSPECIAL(ln, ln_num, char_pos):
     value=ln[char_pos]
