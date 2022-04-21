@@ -10,9 +10,6 @@ chmod +x src/project2.py; src/project2.py "examples/if.txt"
 """
 
 import sys
-from symbol_table import *
-from Lexeme import Lexeme
-from LexicalAnalyzer import *
 
 __author__ = "Christopher Wagner"
 __credits__ = ["Christopher Wagner"]
@@ -23,6 +20,24 @@ __email__ = "cwagne17@students.towson.edu"
 __status__ = "Development"
 
 # --------------------------
+# Project 1 Global Variables
+# --------------------------
+
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
+DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+UNDERSCORE = "_"
+
+SYNTAX_SPECIAL_CHARS = [":", ";", "(", ")", "<", ">", "=", "!", "/", "+", "-", "*"]
+TWO_DIGIT_SPECIAL_CHARS = [":=", "=<", "!=", ">=", "//"]
+
+KEYWORDS = ["program", "end", "bool", "int", "if", "then", "else", "fi", "while", "do", "od", "print", "or", "and", "not", "false", "true"]
+
+COMMENT="//"
+NEWLINE="\n"
+WHITESPACE=" "
+TAB="\t"
+
+# --------------------------
 # Project 2 Global Variables
 # --------------------------
 
@@ -30,7 +45,86 @@ CHAR_POSITION=0
 LINE_NUMBER=0
 CURR_SYMBOL=None
 FILE_CONTENT=None
+
+# --------------------------
+# Project 1 Section of Code
+# --------------------------
+
+class Lexeme:
+    """Type for identifying tokens in mini-language's lexical analyzer
+
+    Returns:
+        obj: Type with position, kind, and value 
+    """
+    ln_num = 0
+    char_pos = 0
+    kind = ""
+    value = ""
+    
+    def __init__(self, ln_num: int, char_pos: int, kind: str, value):
+        """constructor for Lexeme
+
+        Args:
+            ln_num (int): the line position of the token
+            char_pos (int): the char position of the token on a given line
+            kind (str): the kind, ID, NUM, or its value
+            value (str | int): the characters that make up the token
+        """
+        self.ln_num = ln_num
+        self.char_pos = char_pos
+        self.kind = kind
+        self.value = value
    
+def getPosition(ln_num=0, char_pos=0):
+    return f"{ln_num+1}:{char_pos+1}"
+
+def invalidChar( ln_num=0, char_pos=0, char=""):
+    print(f"{getPosition(ln_num, char_pos)} Character is invalid, {char}")
+    exit()
+
+def recognizeID(ln, ln_num=0, char_pos=0):
+    value=""
+    kind="ID"
+    position=char_pos
+    
+    while position < len(ln):
+        if not(ln[position]in LETTERS or ln[position] in UNDERSCORE or ln[position] in DIGITS): break
+        value=value+ln[position]
+        position+=1
+    
+    token = Lexeme(ln_num, char_pos, value, "") if value in KEYWORDS else Lexeme(ln_num, char_pos, kind, value)
+        
+    return position, token
+
+def recognizeNUM(ln, ln_num, char_pos):  
+    value=""
+    kind="NUM"
+    position=char_pos
+    
+    while position < len(ln):
+        if ln[position] not in DIGITS: break
+        value=value+ln[position]
+        position+=1
+        
+    return position, Lexeme(ln_num, char_pos, kind, int(value))
+
+def recognizeSPECIAL(ln, ln_num, char_pos):
+    value=ln[char_pos]
+    position=char_pos
+    
+    if position+1 < len(ln) and ln[position+1] not in [NEWLINE, WHITESPACE, TAB] and ln[position: position+2] in TWO_DIGIT_SPECIAL_CHARS:
+        value = ln[char_pos: char_pos+2]
+        
+        if value == COMMENT: return len(ln), Lexeme(ln_num, char_pos, kind=COMMENT, value="")
+        
+        position+=2
+
+    elif value not in ["!"]: position+=1
+    
+    else: invalidChar(ln_num, char_pos, value)
+    
+    return position, Lexeme(ln_num, char_pos, kind=value, value="")
+
 # --------------------------
 # Project 2 Section of code
 # --------------------------
@@ -54,7 +148,6 @@ def program():
 
 def body():
     if CURR_SYMBOL.kind in ["bool", "int"]: declarations()
-    print('here')
     statements()
 
 def declarations():
@@ -147,47 +240,6 @@ def printStatement():
     next()
     expression()
 
-"""
-How to make an AST...
-
-def term():
-    tree:=factor()
-    while curr_sym is multiplicative_operator:
-        op:=curr_symbol
-        next()
-        tree2:=factor()
-        tree:=node(op, tree, t2)
-    return tree
-"""
-
-"""
-Complete Error Parsing
-
-1. extend functions to accept set of follow symbols for some non terminal symbol
-
-def main():
-    next()
-    program(["end-of-text"])
-
-def program(follow):
-    match("program")
-    match("ID")
-    match(":")
-    body(["end"])
-    match("end")
-
-def body(follow):
-    if curr_sym is "bool" or "int":
-        declarations(["ID", "if", "while", "print"])
-    statements(follow)
-    
-def declarations(follow):
-    declaration(follow U "bool" U "int")
-    while curr_symbol is "bool" or "int":
-        declaration(follow U "bool" U "int")
-    expected(follow U "bool" or "int")
-"""
-
 # --------------------------
 # Project 1 Next function
 # --------------------------
@@ -232,14 +284,17 @@ def main():
             print("File input not given.")
             exit()
         
-        print("Position\tKind\t\tValue")
-        
         with open(sys.argv[1]) as fin:
             FILE_CONTENT = fin.readlines()
-            
+            if len(FILE_CONTENT) == 0:
+                print("File is empty.") 
+                exit()
+
+        print("Position\tKind\t\tValue")
         next()
         program()
     except Exception as e:
         print(e)
+
 if __name__ == "__main__":    
     main()
