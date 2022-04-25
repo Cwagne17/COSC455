@@ -70,9 +70,13 @@
 (defun exp (ast alist)
   "Evaluate an expression (given this alist to represent the variable store)."
   (cond
-   ((eq (kind ast) 'BOOL_LITERAL) (operand 0 ast))
+   ((eq (kind ast) 'BOOL_LITERAL) (eq (operand 0 ast) 'True))
    ((eq (kind ast) 'INT_LITERAL)  (operand 0 ast))
-   ((eq (kind ast) 'VARIABLE)     (lookup (operand 1 ast) alist))
+   ((eq (kind ast) 'VARIABLE)     (cond
+				   ((eq (lookup (operand 1 ast) alist) 'True) t)
+				   ((eq (lookup (operand 1 ast) alist) 'False) nil)
+				   (t (lookup (operand 1 ast) alist))
+				  ))
    ((eq (kind ast) 'OP_PLUS)      (+ (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
    ((eq (kind ast) 'OP_MINUS)     (- (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
    ((eq (kind ast) 'OP_MULT)      (* (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))

@@ -8,8 +8,8 @@
    ((eq offset (caar alist)) (cons (cons offset value) (cdr alist)))
    (t                        (cons (car alist)
                                    (store offset value (cdr alist))))
-   )
   )
+)
 
 (defun lookup (offset alist)
   "Return the value associated with this offset, or raise an error."
@@ -17,8 +17,8 @@
    ((null alist)             (user-error "UNINITIALISED %s" offset) (exit))
    ((eq (caar alist) offset) (cdar alist))
    (t                        (lookup offset (cdr alist)))
-   )
   )
+)
 
 ;; (setq a (store 1 19  (store 0 17 ())))
 ;; a
@@ -34,19 +34,24 @@
 (defun kind (ast)
   "The kind of an AST node"
   " Your code goes here."
-  
-  )
+  (car ast)
+)
 
 (defun position (ast)
   "The position stored in an AST node"
   (cadr ast)
-  )
+)
 
 (defun operand (n ast)
   "The n'th operand of an AST node."
   " Your code goes here."
-  
+  (cond
+   ((eq n 0) (caddr ast))
+   ((eq n 1) (cadddr ast))
+   ((eq n 2) (caddddr ast))
+   ((null ast) (user-error "INTERNAL SERVICE ERROR") (exit))
   )
+)
 
 ;; (setq ast '(OP_PLUS pos (VARIABLE pos b 1) (INT_LITERAL pos 77)))
 ;; (kind ast)
@@ -67,11 +72,22 @@
   (cond
    ((eq (kind ast) 'BOOL_LITERAL) (operand 0 ast))
    ((eq (kind ast) 'INT_LITERAL)  (operand 0 ast))
-   ((eq (kind ast) 'VARIABLE) ...
-   " Your code goes here."
-
-    
-   )
+   ((eq (kind ast) 'VARIABLE)     (lookup (operand 1 ast) alist))
+   ((eq (kind ast) 'OP_PLUS)      (+ (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_MINUS)     (- (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_MULT)      (* (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_DIV)       (/ (exp (operand 0 ast) alist) (exp (operand 1 ast) alist))) 
+   ((eq (kind ast) 'OP_EQ)        (eq (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_NEQ)       (not (eq (exp (operand 0 ast) alist) (exp (operand 1 ast) alist))))
+   ((eq (kind ast) 'OP_LT)        (< (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_LTE)       (<= (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_GT)        (> (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_GTE)       (>= (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_AND)       (and (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_OR)        (or (exp (operand 0 ast) alist) (exp (operand 1 ast) alist)))
+   ((eq (kind ast) 'OP_NOT)       (not (exp (operand 0 ast) alist)))
+  )
+)
 
 ;; (exp ast a)
 ;; (exp '(BOOL_LITERAL pos True) a)
