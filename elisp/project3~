@@ -1,0 +1,146 @@
+;; Step 1: How to read the AST
+;;
+;; Every node is a lisp list
+;;
+;; Format:
+;; ( kind position left-child right-child )
+;;
+;; ** if has three children **
+;;
+;; Ex. 2 + 3 
+;; ( Op_plus position ( INT_LITERAL position  2 ) ( INT_LITERAL position 3 ) )
+;;
+;; ---------------------------------------------------------------------
+;;
+;; Supported Kinds
+;;
+;; Int_Literal - 2
+;; ( Int_Literal position 2 )
+;;
+;; Bool_Literal - true or false
+;; ( Bool_literal position True )
+;;
+;; (Op_Plus Pos
+;; 	    ( Int_literal pos 2)
+;;	    ( Int_literal pos 3)
+;; )
+;;
+;; Op_Mult
+;; Op_Sub
+;; Op_Division ... all the same as Op_Plus
+;;
+;; Variable declaration
+;; ( cons 'a 2) creates association (a . 2)
+;; don't use variable names to assign identifiers use unqiue integers (offset is provided)
+;;
+;; ( VARIABLE pos name offset)
+;;
+;; Ex. a + 1
+;; (Op_plus pos ;; add the left child to the right child
+;; 	    ( Variable pos a 1 ) ;; fetch the value at offset 1
+;;	    ( Int_literal pos 3 ) ;; return 3
+;; )
+;;
+;; Assignment: c := l ;; some expression l
+;; (Assignment pos
+;; 	       ( Variable pos c 4)
+;;	       l ;; can be a complicated expression
+;; )
+;;
+;; Not a < 0
+;; (Op_not pos
+;;   	   (Op_lt pos
+;;	   	  ( Variable pos a 1 )
+;;		  ( Int_literal pos 0 )
+;;	   )
+;; )
+;;
+;; Declarations
+;; (Decl pos a int)
+;;
+;; if x = 1 then a := a + 1
+;; else a : = 1
+;; ** doesn't nessecarily have an else (in that case there will only be two children)
+;;
+;; (Op_if pos
+;; 	  ( Op_Eq pos
+;;	    	 ( Variable pos x 4 )
+;;		 ( Int_literal pos 1 )
+;;	  )
+;;	  ( Assignment pos
+;;	    	       ( Variable pos a 1)
+;;		       ( Op_Plus pos
+;;		       	 	 (Variable pos a 1 )
+;;				 (Int_literal pos 2)
+;;		       )
+;;	  )
+;;	  (Assignment pos
+;;	  	       ( variable pos a 1)
+;;		       (Int_literal pos 1)
+;;	  )
+;;  )
+;;
+;; Variable Store
+;; ( (0 5) (1 3) (3 6) )
+;; three variables, car is offset, cdr is value
+;; check caar to check if offset eq head of first stored variable
+;; get cdar to get value if it matches
+;;
+;; need a function called lookup to return value in store
+
+(defun lookup (offset alist)
+       "Return value in store associated to offset, or throw an error."
+       (cond
+	((null alist)			(user-error "UNINITIALIZED %s" offset) (exit))
+	((eq (caar alist) offset) 	(cdar alist))
+	(t   	    	  		(lookup offset (cdr alist)))
+       )
+)
+
+(defun store (offset value alist)
+       "Put value in offset in alist."
+       (cond
+	((null alist)			(list (cons offset value))) ;; list creates a list of ((offset value))
+	((eq offset (caar alist)) 	(cons (cons offset value)
+	     	    	  		      (cdr alist))) ;; replaces current variable with updated value
+	(t   	    	  		(cons (car alist)
+					      (store offset value (cdr alist)))
+	)
+       )
+)
+
+;; (setq a (store 1 19 (store 0 17 ())))
+;; (setq a (store 2 20 a))
+;; (setq a (store 1 29 a))
+;; a
+;; (lookup 3 ())
+;; (lookup 3 a)
+;; (lookup 1 a)
+
+(defun kind (ast)
+       "The kind of an AST node"
+       "Your code goes here."
+)
+
+(defun position (ast)
+       "The positiion stored in an AST node"
+       (cadr ast)
+)
+
+(defun operand (n ast)
+       "The n'th operand of an AST node."
+)
+
+;; (setq ast '(PLUS pos (VARIABLE pos b 1) (INT_LITERAL pos 77)))
+;; (kind ast)
+;; (position ast)
+;; (kind (operand 0 ast))
+;; (operand 1 ast)
+
+(defun exp (ast alist)
+       (cond
+	((eq (kind ast) 'BOOL_LITERAL') (operand 0 ast))
+	((eq (kind ast) 'INT_LITERAL') (operand 0 ast))
+	"Continue here"
+       )
+)

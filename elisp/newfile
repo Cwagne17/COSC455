@@ -47,9 +47,9 @@
        )
 )
 
-(eqlist '(1 2 3) '(1 2 3))
-(eqlist '(1 2 3) '(1 2 4))
-(eqlist '(1 2 '()) '(1 2 3))
+;; (eqlist '(1 2 3) '(1 2 3))
+;; (eqlist '(1 2 3) '(1 2 4))
+;; (eqlist '(1 2 '()) '(1 2 3))
 
 (defun member (a ls)
      "returns whether an atom is the member of a list"
@@ -60,8 +60,8 @@
      )
 )
 
-(member 2 '(4 6 2 9))
-(member 2 '(4 6 3 9))
+;; (member 2 '(4 6 2 9))
+;; (member 2 '(4 6 3 9))
 
 (defun nonlat (ls)
        "returns true if all members are not atoms"
@@ -88,6 +88,17 @@
 ;; (rember 2 '(2 3 1))
 ;; (rember 2 '(2 3 1 2))
 ;; (rember 2 '(3 2 1))
+
+(defun rember2 (x l)
+       "Remove the second occurance of x in a list l"
+       (cond
+	((null l) l)
+	((eq x (car l)) (cons x (rember x (cdr l))))
+	(t (cons (car l) (rember2 x (cdr l))))
+       )
+)
+
+;; (rember2 2 '(3 2 4 2 4 5))
 
 (defun sumlist (l)
        "returns sum of the list of atoms"
@@ -217,3 +228,22 @@ a
 (cons 1 '(5 6 7)) ;; current use
 (setq mycons (cons 2 4)) ;; can be used to create a dictionary key value atom pairs
 (cdr mycons)
+
+(defun count(x l)
+       "Count number of occur of x in l"
+       (cond
+	((null l) 0)
+	((eq x (car l)) (+ 1 (count x (cdr l))))
+	(t (count x (cdr l)))
+       )
+)
+
+(defun occurN (l1 l2)
+       "Returns the total number of times that a member of l1 appears in l2"
+       (cond
+	((null l1) 0)
+	(t (+ (count (car l1) l2) (occurN (cdr l1) l2)))
+       )
+)
+
+;; (occurN '(1 2) '(3 2 4 1 2 3 1))

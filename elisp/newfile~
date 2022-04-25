@@ -98,3 +98,122 @@
 )
 
 (sumlist '(1 2 3 4))
+
+(defun firsts (l)
+       "Returns new list of the heads of each of the lists in the param list"
+       (cond
+	((null l) '())
+	(t (cons (car(car l)) (firsts (cdr l))))
+       )
+)
+
+;; (firsts '( (1 2) (2 3) (3 4) ))
+
+(defun replace (old new list)
+       "Replace first occurance of old with new"
+       (cond
+	((null list) '())
+	( (eq (car list) old) (cons new (cdr list)))
+	(t (cons (car list) (replace old new (cdr list))))
+       )
+)
+
+;; (replace 'fruit 'candy '(flower fruit icecream))
+;; (replace 'fruit 'candy '(fruit flower fruit icecream))
+
+(defun replaceAll (old new list)
+       "Replace all occurances of old with new"
+       (cond
+	((null list) '())
+	( (eq (car list) old) (cons new (replaceAll old new (cdr list))))
+	(t (cons (car list) (replaceAll old new (cdr list))))
+       )
+)
+
+;; (replaceAll 'fruit 'candy '(flower fruit icecream))
+;; (replaceAll 'fruit 'candy '(fruit flower fruit icecream))
+
+(defun insertR (old new list)
+       "Inserts new to the right of old in the list"
+       (cond
+	( (null list) '() )
+	( (eq (car list) old) (cons (car list) (cons new (cdr list))) )
+	( t (cons (car list) (insertR old new (cdr list))) )
+       )
+)
+
+;; (insertR 2 5 '(1 3 2 6 9))
+;; (insertR 2 5 '(2 1 3 2 6 9))
+
+(defun insertAllR (old new list)
+       "Inserts new to the right of old in the list"
+       (cond
+	( (null list)
+	  	list
+	)
+	( (eq (car list) old)
+	        (cons (car list) (cons new (insertAllR old new (cdr list))))
+	)
+	( t
+		(cons (car list) (insertAllR old new (cdr list)))
+	)
+       )
+)
+
+;; (insertAllR 2 5 '(1 3 2 6 9))
+;; (insertAllR 2 5 '(2 1 3 2 6 9))
+
+(defun pick (n l)
+       "Return the nth element"
+       (cond
+	( (null l)
+	  	nil
+	)
+	( (eq n 1)
+	      (car l)
+	)
+	( t
+	      (pick (- n 1) (cdr l))
+	)
+       )
+)
+
+;; (pick 1 '(2 3 4))
+;; (pick 2 '(2 3 4))
+;; (pick 4 '(2 3 4))
+
+(defun leftmost (l)
+	"Return the leftmost item in the list regardless if it is nested"
+	(cond
+	 ( (null l) nil)
+	 ( (atom (car l)) (car l) )
+	 ( t (leftmost (car l)))
+	)
+)
+
+;; all return 3
+;; (leftmost '(3 (4 5) 6))
+;; (leftmost '((3) (4 5) 6))
+;; (leftmost '(((((3)))) 4 (5 6)))
+
+
+(car (car '((3 4) 5 6)))
+(caddr '((3 4) 5 6))
+
+(setq a 10) ;; sets the variables a = 10
+a
+
+(setq mylist '(2 4 6 8)) ;; sets the variable mylist = (2 4 6 8)
+mylist
+(car mylist)
+(cdr mylist)
+
+(if (> a 20) (+ a 1) (- a 1)) ;; if [a > 20]; then a + 1 else a - 1 fi
+a ;; if doesn't change value, would require another setq
+
+(set 'a 9) ;;
+a
+
+(cons 1 '(5 6 7)) ;; current use
+(setq mycons (cons 2 4)) ;; can be used to create a dictionary key value atom pairs
+(cdr mycons)
