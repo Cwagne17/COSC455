@@ -253,7 +253,7 @@ def next():
             if FILE_CONTENT[LINE_NUMBER][CHAR_POSITION] == NEWLINE:
                 CHAR_POSITION = 0
                 LINE_NUMBER += 1
-                if LINE_NUMBER >= len(FILE_CONTENT): print(f"{getPosition(LINE_NUMBER, CHAR_POSITION)}\t\tend-of-text"); exit()
+                if LINE_NUMBER >= len(FILE_CONTENT): print('true'); exit()
             else: CHAR_POSITION+=1
 
         # Recognize next token
@@ -289,11 +289,10 @@ def main():
             if len(FILE_CONTENT) == 0:
                 print("File is empty.") 
                 exit()
-
-        print("Position\tKind\t\tValue")
         next()
         program()
     except Exception as e:
+        print('false')
         print(e)
 
 if __name__ == "__main__":    

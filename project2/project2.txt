@@ -1,0 +1,20 @@
+[2022-04-26]
+
+To run the project2.py program.
+
+1. Make the project2.py file executeable
+
+chmod +x project2.py
+
+2. Then run the program with an input file
+
+./project2.py "examples/if.txt"
+
+Takes input from command line.
+
+The output of the program should:
+    return true when syntactically correct
+
+    when a syntax error is encountered the parser stops (terminate execution) and returns the position and the error
+
+    when the file is empty it will print "File is empty."
