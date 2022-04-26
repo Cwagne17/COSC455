@@ -271,7 +271,7 @@ def next():
         
         if CURR_SYMBOL and CURR_SYMBOL.kind == COMMENT: CHAR_POSITION=0; LINE_NUMBER+=1; next()
         
-        if CURR_SYMBOL: print(f"{getPosition(CURR_SYMBOL.ln_num, CURR_SYMBOL.char_pos)}\t\t{CURR_SYMBOL.kind}\t\t{CURR_SYMBOL.value}")
+        # if CURR_SYMBOL: print(f"{getPosition(CURR_SYMBOL.ln_num, CURR_SYMBOL.char_pos)}\t\t{CURR_SYMBOL.kind}\t\t{CURR_SYMBOL.value}")
 
 # --------------------------
 # Project 2 Runtime Section
